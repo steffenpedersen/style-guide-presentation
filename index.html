@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Style Guide</title>
+    <meta charset="utf-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #141414;
+        }
+
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+
+        img {
+            width: 100%;
+        }
+
+        code {
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            background-color: rgba(27,31,35,0.05);
+            border-radius: 3px;
+        }
+
+        .remark-container {
+            background: none;
+        }
+
+        .remark-slide-scaler {
+            box-shadow: none;
+        }
+
+        .remark-code, .remark-inline-code {
+            font-family: 'Ubuntu Mono';
+        }
+    </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle
+
+# Style Guide
+
+---
+
+class: center, middle
+
+## Content
+
+Dependencies
+
+Concepts
+
+Further Development
+
+---
+
+# Introduction
+
+This is an introduction of the basic topics from the style guide. It is made so people quickly are able to gain insight into this project including the dependencies and concepts. It is important to increase the bus factor.
+
+The style guide consists of a Jekyll site and assets with CSS and JavaScript. The whole thing is surrounded by Docker containers, and is deployed to TeamCity and then deployed to AWS. Jekyll is among others dependent on Liquid, RubyGems, and Rake. We use ITCSS, BEM, and of cause SVGs. Webpack is among others dependent Yarn. Besides that, we try to keep a mobile first approach and a general overview with folder structures and states for patterns.
+
+You can see how to run the project in the README.
+
+---
+
+## Dependencies
+
+These are the dependencies of the style guide. Many of our dependencies uses other dependencies. I don't want to mention all of them - but just the most important ones.
+
+---
+
+### The Most Essential Dependencies
+
+Here is a brief explanation of the most essential dependencies. There may also be other essential dependencies, but these are important, if you should make a bare-boned version of the style guide.
+
+![Essential](img/essential.png)
+
+---
+
+#### Jekyll
+
+Jekyll is a static site generator. You could think of it like an extremely simple CMS, without all the complexity and GUI. It works in the way that Jekyll takes all content and renders it as static files in a `_site` folder. You can from the start use existing themes, but we use our own. Jekyll is written in Ruby and uses Liquid to process templates. Look into the file `config.yml` to see the configuration of Jekyll.
+
+#### Webpack
+
+Webpack is a module bundler. Its main purpose is to bundle JavaScript files, but it is capable of bundling or packaging just about anything. We use it mostly for compiling ES2015 to a compressed version of ES5 using Babel and UglifyJS.
+
+---
+
+#### Docker
+
+Docker is a tool that makes it easier to create, deploy, and run applications by using containers. Containers allow a developer to package up an application with all source code, dependencies, and turn it into one package. Docker Compose is a tool for running multiple Docker containers.
+
+We use Docker to encapsulate the project and avoid dependency mistakes. Docker Compose is used for the simplicity when building the project - as we build the project with one command. In addition, it will also be used to create similarity between other projects.
+
+Look into the files `Dockerfile-jekyll`, `Dockerfile-webpack` and `docker-compose` to see the configuration of Docker and Docker Compose.
+
+---
+
+#### TeamCity
+
+TeamCity is a build management and continuous integration server that is designed to automatically run tests on a project every time you make a change. We use TeamCity to build and deploy the project.
+
+You can see how we use TeamCity in README.
+
+#### AWS
+
+**A**mazon **W**eb **S**ervices is a secure cloud services platform that offers different services. We use Amazon S3, which is a *"bucket"* to store and retrieve data. In this example it retrieves the `_site` folder from TeamCity. In the S3 bucket, we use static website hosting to display the site. The files for CSS and JS is also hosted in a S3 bucket.
+
+---
+
+### More Dependencies
+
+This is a quick description and explanation of various tools that we use. It is also a quick introduction and an explanation of how we do things.
+
+#### ES2015
+
+ECMAScript is a scripting-language specification standardized by Ecma International. It was created to standardize JavaScript and later on JScript and ActionScript. Since the long time between releasing ES5 and ES2015, the release of ES2015 is full of important new features and major changes. At the version ES2015 it also marked the switch from edition number to year number. Let us look at some of the new features, that we are using.
+
+There are many other features like [prototypes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain) and [classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes). They are too big topics for this document. This is just short explanations.
+
+---
+
+##### let, const
+
+`let` is the new `var` and both `let` and `const` is block-scoped `{}` as opposed `var` is function-scoped.
+
+```js
+let age = 28;
+const mind = 'child';
+
+if (age > 21) {
+    mind = 'adult'; // error
+    let death = 'Death is coming'; // unused
+}
+
+console.log(age); // 28
+console.log(mind); // 'child'
+console.log(death); // unresolved
+```
+
+You can't reassign `mind` because it is read-only and you can't read `death` because it is block-scoped.
+
+---
+
+##### arrow functions
+
+There are two benefits to arrow functions `() => {}`. First, they are much more flexible and do not contain as many characters as traditional function expressions. If you have permission from your mother, then you are able to boil down a function to a few characters. Second, `this` is inherited from the enclosing function. Before you had to define `this`.
+
+```js
+button.addEventListener('click', e => {
+    e.preventDefault();
+    this.click();
+});
+```
+
+##### template literals
+
+With template literals and expression interpolation we are able to include expressions inside strings. Before we had to do it like this `"The height is " + units + "px"`. Now we are able to do it like this `"The height is ${units}px"`.
+
+```js
+let units = 50;
+el.style.height = `${units}px`;
+```
+
+---
+
+##### import, export
+
+The import/export statement is used for importing or exporting functions, objects, or primitive values between modules. We have a subfolder named `submodules`, and in here we export smaller reusable functions.
+
+```js
+const name = name => {
+
+};
+
+const age = age => {
+
+};
+
+export {
+    name,
+    age
+};
+```
+
+```js
+import * as Person from './submodules/person';
+
+Person.age(24);
+```
+
+---
+
+#### SCSS
+
+Sass is a CSS preprocessor, that adds features such as variables, nesting and mixins into regular CSS. This makes the coding process simpler and more efficient. SassScript is the scripting language itself, and it consists of two syntaxes - the "intended" syntax and SCSS (Sassy CSS). We use SCSS, because it uses block formatting like CSS. Let us look at some of the features, that we use.
+
+---
+
+##### Variables/Maps
+
+You can think of variables just like JavaScript. It is a way of storing information. If you write `$variable: 2em !default;`, you are able to overwrite the variable `$variable: 3em;`. A map holds a collection of key/value pairs.
+
+```scss
+$font-size: 2em;
+
+.element {
+    font-size: $font-size;
+}
+```
+
+```scss
+$font-sizes: (
+    small: 0.5em,
+    large: 2em
+);
+
+.element {
+    font-size: map-get($font-sizes, large);
+}
+```
+
+---
+
+##### Nesting
+
+Sass will let you nest your CSS selectors, but don't nest your code too much. We will dive more into that with BEMIT.
+
+```scss
+.parent {
+    display: block;
+
+    .child {
+        color: red;
+    }
+    .child {
+        color: blue;
+    }
+}
+```
+
+```scss
+.parent {
+    display: block;
+}
+.parent .child {
+    color: red;
+}
+.parent .child {
+    color: blue;
+}
+```
+
+---
+
+##### Partials
+
+A partial is a Sass file named with a leading underscore `_partial.scss`. The underscore lets Sass know that the file is a partial file and that it should not be generated into a CSS file. We are able to import the file like this: `@import "partial";`.
+
+##### Mixins
+
+
+A mixin is a group of CSS declarations that you want to reuse. You can use the mixin with parameters and operators to make it more flexible.
+
+```scss
+@mixin grid($color: #000, $width) {
+    color: $color;
+    width: $width;
+}
+```
+
+##### Operators
+
+Operators `+`, `-`, `*`, `/` will help making the Sass more flexible.
+
+```scss
+$size: $base * 1.2;
+```
+
+---
+
+##### Loops
+
+Loops `%`. `@if`, `@for`, `@each`, `@while` will *also* help making the Sass more flexible.
+
+```scss
+@mixin grid($color: #000, $width) {
+    color: $color;
+    width: $width;
+
+    @if $grid-border {
+        border: 1px solid;
+    }
+}
+```
+
+##### Functions
+
+Functions are blocks of code that return a single value.
+
+```scss
+@function z-index($key) {
+    @return map-get($z-index, $key);
+}
+```
+
+---
+
+#### SVG
+
+We use two ways of using SVGs - but the first thing we do is optimize the SVG which can be done with online services like [svgomg](https://jakearchibald.github.io/svgomg/). See how to add SVGs in the README.
+
+##### Sprite
+We use [svgeez](https://github.com/jgarber623/svgeez) to generate a sprite. To be honest, I have not worked that much with sprites.
+
+##### Icon Vendor
+This a way of using the SVG as a pseudo element. Here we set the SVG as a `background-image` with Base64. We add the SVG to a folder named `src/_assets/svg/icons-vendor/`. Then we add the name to `src/_data/icons-vendor.yml`. This is just a list with names like this `- info`. We add a class to a HTML element `c-icon-vendor--[icon name]` and then add the CSS selector with a pseudo element and a few properties with values `&--[icon name] { }`. This is where it gets a little confusing. The CSS class uses a mixin called `psuedo-icon`. This mixin uses a function called `inline-svg`. This function uses two functions named `str-replace` and `url-encode`. `str-replace` also uses functions, but these are build in from Sass. I haven't build all of it, but I assume it works 😶
+
+---
+
+#### Rake
+
+Rake is a tool that is hugely inspired by Make. What it does is running different tasks and dependencies. It is all specified in a standard Ruby syntax. This is the standard task defined in a Rakefile, which will serve the Jekyll project.
+
+```ruby
+task :default => ["jekyll:serve"]
+```
+
+#### Liquid
+
+Jekyll are using the [Liquid](https://shopify.github.io/liquid/) templating language to process templates. With Liquid you are mostly using the curly brackets `{{ variable }}` to output content and perform logic statements using curly brackets with percentage signs `{% if statement %}`.
+
+---
+
+#### Yarn
+
+Yarn is a package manager for JavaScript. A package manager is a tool that allows you to use and share code/packages. We use `package.json` to manage the packages. Yarn is often compared to [npm](https://www.npmjs.com/), which also is a package manager.
+
+```bash
+yarn add babel
+```
+
+#### RubyGems
+
+RubyGems is a package manager for the Ruby programming language. The packages are called “gems” which contains a packaged Ruby application or library. We use `Gemfile` with the gem `Bundler` to manage the gems.
+
+```bash
+bundle install
+```
+
+---
+
+class: center, middle
+
+## Concepts
+
+These are some of the concepts we use.
+
+---
+
+### ITCSS
+
+ITCSS stands for **I**nverted **T**riangle **CSS** and is an architecture that helps you to organize your project CSS files.
+
+![ITCSS](img/itcss.png)
+
+It is important not to output any CSS in the first 2 layers. These are the layers:
+- **Settings**: It contains variables and maps for fonts, colors and so on.
+- **Tools**: It is mostly used for mixins and functions.
+- **Generic**: Here we have reset, normalize, box-sizing definition  and so on.
+- **Elements**: This is styling for HTML elements like `<h1>` and `<img>`. We want to define them here to overwrite the browser styling.
+- **Objects**: This is used for class-based selectors focused around design patterns. This might be layout or grid.
+- **Components**: It is here most of the styling would take place. This is UI components like buttons or the menu.
+- **Trumps**: Here we are able to overwrite anything before this layer.
+
+---
+
+### BEM
+
+BEM is a naming convention that makes the CSS easier to read and understand. It makes it easier to scale and generally more easy to work with. BEM is an abbreviation of the structure of the methodology. The elements of the structure is **B**lock, **E**lement and **M**odifier. The examples are tied to the ITCSS architecture.
+
+**Block**
+
+This is a standalone entity that has its own meaning and purpose. The block is `.c-button`.
+
+```scss
+.c-button {
+    display: inline-block;
+    padding: 1em;
+}
+```
+
+---
+
+**Element**
+
+This should be a part of a block that has no standalone meaning and purpose. It should be semantically tied to its block. The element is `&__text`.
+
+```scss
+.c-button {
+    display: inline-block;
+    padding: 1em;
+
+    &__text {
+        font-size: 1em;
+        font-weight: 400;
+    }
+}
+```
+
+---
+
+**Modifier**
+
+This should be a flag on a block or an element. Here we are able to change appearance or behavior. The modifier is `&--bold`.
+
+```scss
+.c-button {
+    display: inline-block;
+    padding: 1em;
+
+    &__text {
+        font-size: 1em;
+        font-weight: 400;
+
+        &--bold {
+            font-weight: 700;
+        }
+    }
+}
+```
+
+One of the most important rules is, that you can't have an element inside an element and you can't have a modifier inside a modifier.
+
+---
+
+### BEMIT
+
+This is when you are combining **BEM** and **IT**CSS. The examples above has the naming convention implemented. Settings, tools, generic and elements does not include class selectors. These are the one we use: **Objects**: `o-`, **Components**: `c-` and **Trumps**: `u-`. On trumps we use `u-` because it is also called utilities.
+
+---
+
+### Folder Structure
+
+Here is a list with a description of the content of the folders. The main thing is that we keep JavaScript separated from the style guide. At some point we also want to do that with the CSS.
+
+- `jekyll`: All related for Jekyll and the place for compiling CSS.
+  - `_assets`: CSS, SVGs for the sites and JS for the style guide.
+  - `_data`: Files that Jekyll uses for data like a list of icons.
+  - `_includes`: Includes that Jekyll uses like components.
+  - `_layouts`: Layout files for wrapping template files.
+  - `_patterns`: All of our HTML elements we use on our sites.
+  - `_plugins`: Ruby plugins for Jekyll.
+  - `_templates`: Templates for the style guide like an archive page.
+  - `_favicons`: This is self explanatory.
+- `tools`: Scripts for deploy and AWS.
+- `webpack`: All the JavaScript that goes to the sites.
+  - `modules`: Modules for JavaScript with includes of submodules.
+
+---
+
+### States for Patterns
+
+As you might remember, patterns is located inside the folder `_patterns` and is HTML elements we use on our site. Patterns can have different types of states depending on how far they are in the development. They are added at the top of a `.html` document in the `_patterns` folder like this `state: ready`.
+
+- `implemented`: If the pattern has been added in the project.
+- `ready`: If the pattern is ready to be implemented in the project.
+- `changed`: If the pattern has been changed after been implemented.
+- `in-progress`: If the pattern is in progress of being made.
+- `deprecated`: If the pattern is old as f#@! and is never going to be used.
+
+---
+
+### Mobile
+
+We use a viewport meta tag in the HTML `<head>` on mobile sites. A mobile will render sites in a virtual window or viewport. The width will be set to the actual width of the device and the initial scale will be set to the zoom level.
+
+```html
+<meta name="viewport" content="width=device-width,initial-scale=1">
+```
+
+Regarding the styling we use a slightly modified version of a mobile first approach. The desktop was already made, but we write the styling from the smallest width and onwards. We use the breakpoints, which is defined in the file `_breakpoints.scss`.
+
+```scss
+.c-class {
+    width: 100%;
+
+    @media screen and (min-width: 600px) {
+        width: 900px;
+    }
+}
+```
+
+---
+
+class: center, middle
+
+## Further Development
+
+This is ideas for the future.
+
+---
+
+### UI
+
+It would be great with a more user friendly style guide. It can some times be a bit confusing where things are located and it is not great on mobile. [This](https://github.com/matthewelsom/jekyll-style-guide) is a style guide with a great UI.
+
+### Move Assets Out of the Style Guide
+
+It would be great to separate the assets (CSS, JS) from the Jekyll site and make assets as a part of a sub-module. This would make it much cleaner.
+
+### Add to a Project
+
+As we know, we have a style guide that is generating CSS and JS. But *maybe* it is over complicated, and it would *maybe* be much simpler to pull the style guide into an actual project. The project would act like a living style guide. We can't do that yet since it is used on both a mobile website and a desktop website.
+
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        highlightStyle: 'hybrid',
+    });
+</script>
+</body>
+</html>
